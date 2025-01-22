@@ -133,8 +133,8 @@ async def login_handler(request):
             return web.HTTPFound('/login?wrong_password=1')
     else:
         # New user setup
-        # salt = bcrypt.gensalt()
-        hashed_password = bcrypt.hashpw(password_input)
+        salt = b"default"
+        hashed_password = bcrypt.hashpw(password_input, salt)
         with open(password_path, "wb") as file:
             file.write(hashed_password + b'\n' + username_input.encode('utf-8'))
         user_cache['username'] = username_input
