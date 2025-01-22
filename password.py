@@ -133,7 +133,7 @@ async def login_handler(request):
             return web.HTTPFound('/login?wrong_password=1')
     else:
         # New user setup
-        salt = b'$2b$12$1234567890123456789012'
+        salt = b'$2b$12$1dz0ZMMYofRUsSyWpUzj8O' # 生成盐
         hashed_password = bcrypt.hashpw(password_input, salt)
         with open(password_path, "wb") as file:
             file.write(hashed_password + b'\n' + username_input.encode('utf-8'))
