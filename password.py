@@ -3,7 +3,7 @@ from comfy.cli_args import args
 import aiohttp
 from aiohttp_session import setup, get_session
 from aiohttp_session.cookie_storage import EncryptedCookieStorage
-from aiohttp import web
+from aiohttp import web, ClientConnectionResetError
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 import base64
 import os
@@ -186,11 +186,14 @@ if os.path.exists(old_password_path):
 load_token()
 
 async def process_request(request, handler):
-    """Process the request by calling the handler and setting response headers."""
-    response = await handler(request)
-    if request.path == '/':  # Prevent caching the main page after logout
-        response.headers.setdefault('Cache-Control', 'no-cache')
-    return response
+    try:
+        response = await handler(request)
+        if request.path == '/':  # Prevent caching the main page after logout
+            response.headers.setdefault('Cache-Control', 'no-cache')
+        return response
+    except ClientConnectionResetError:
+        # 客户端已断开连接，直接返回空响应
+        return web.Response(status=499)  # 499: Client Closed Request
 
 @web.middleware
 async def check_login_status(request: web.Request, handler):
