@@ -245,7 +245,7 @@ async def check_login_status(request: web.Request, handler):
     else:
         return web.json_response({'error': 'Authentication required.'}, status=401)
 
-app.middlewares.insert(0, check_login_status)
+app.middlewares.append(check_login_status)
 
 old_css_path = os.path.join(node_dir, "old_css")
 app.router.add_static('/old_css/', old_css_path)
